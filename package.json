@@ -2,7 +2,7 @@
   "name": "proydashboard",
   "private": true,
   "version": "0.0.0",
-  "homepage": "https://alejandrosv2004.github.io/dashboard",
+  "homepage": "https://alejandrosv2004.github.io/DashboardProyecto",
   "type": "module",
   "scripts": {
     "dev": "vite",
