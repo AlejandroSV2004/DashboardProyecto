@@ -37,8 +37,7 @@ function App() {
   const [selectedDate, setSelectedDate] = useState<String>(''); // Fecha seleccionada
   const [items, setItems] = useState<Item[]>([]); // Todos los datos
   const [filteredItems, setFilteredItems] = useState<Item[]>([]); // Datos filtrados
-  const [indicators, setIndicators] = useState<Indicator[]>([]);
-  const [owm, setOWM] = useState(localStorage.getItem('openWeatherMap'));
+  const [indicators] = useState<Indicator[]>([]);
 
   // Manejador para la fecha seleccionada
   const handleDateChange = (date: String) => {
