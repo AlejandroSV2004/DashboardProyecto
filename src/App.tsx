@@ -103,7 +103,7 @@ function App() {
     <Grid container spacing={5}>
       {/* Título Principal */}
       <Grid size={{ xs: 12 }}>
-        <h1 style={{ textAlign: 'center' }}>¡Bienvenidos a mi dashboard climático!</h1>
+        <h1 style={{ textAlign: 'center' }}>El tiempo en Guayaquil</h1>
       </Grid>
   
       {/* Fecha Seleccionada */}
