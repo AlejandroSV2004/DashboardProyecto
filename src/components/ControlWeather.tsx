@@ -8,7 +8,7 @@ import FormControl from '@mui/material/FormControl';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
 
 interface ControlWeatherProps {
-    onDateChange: (date: String) => void; // Prop para enviar el valor seleccionado
+    onDateChange: (date: string) => void; // Prop para enviar el valor seleccionado
   }
   const formatFechaHora = (fecha: string): string => {
     if (!fecha) return ''; // Si la fecha está vacía, retornar cadena vacía

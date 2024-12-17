@@ -8,15 +8,18 @@ import ControlWeather from './components/ControlWeather';
 import LineChartWeather from './components/LineChartWeather';
 import Item from './interface/Item';
 import { useEffect, useState } from 'react';
-
+import ImageControl from './components/ImageControl'
+import TemperatureIndicator from './components/TemperatureIndicator';
 interface Indicator {
   title?: String;
   subtitle?: String;
   value?: String;
 }
 
+
+
 const formatFechaHora = (fecha: string): string => {
-  if (!fecha) return ''; // Si la fecha está vacía, retornar cadena vacía
+  if (!fecha) return 'Seleccione una fecha y hora'; // Si la fecha está vacía, retornar cadena vacía
   
   const date = new Date(fecha);
 
@@ -33,10 +36,23 @@ const formatFechaHora = (fecha: string): string => {
 
 
 function App() {
+  function kelvinToCelsius(kelvin: string): string {
+    const kelvinNumber = parseFloat(kelvin);
+  
+    if (isNaN(kelvinNumber)) {
+      console.error("El valor proporcionado no es un número válido.");
+      return "0.00"; // Devuelve un valor por defecto en caso de error
+    }
+  
+    return (kelvinNumber - 273.15).toFixed(2); // Devuelve la temperatura en formato string con 2 decimales
+  }
+  
   // Estados
   const [selectedDate, setSelectedDate] = useState<String>(''); // Fecha seleccionada
   const [items, setItems] = useState<Item[]>([]); // Todos los datos
   const [filteredItems, setFilteredItems] = useState<Item[]>([]); // Datos filtrados
+  const [feel,setFeel]=useState<string[][]>([]);
+  const [filteredFeel, setFilteredFeel]=useState<string[]>([])
   const [indicators] = useState<Indicator[]>([]);
 
   // Manejador para la fecha seleccionada
@@ -59,7 +75,7 @@ function App() {
         const parser = new DOMParser();
         const xmlDoc = parser.parseFromString(data, 'application/xml');
         const timeElements = xmlDoc.getElementsByTagName('time');
-
+        const feels: string[][] = [];
         const dataToItems: Item[] = [];
         for (let i = 0; i < timeElements.length; i++) {
           const time = timeElements[i];
@@ -69,10 +85,12 @@ function App() {
             time.querySelector('precipitation')?.getAttribute('probability') || '0';
           const humidity = time.querySelector('humidity')?.getAttribute('value') || '0';
           const temperature = time.querySelector('temperature')?.getAttribute('value') || '0';
-
+          const feelsLike = time.querySelector('feels_like')?.getAttribute('value') || '0';
+          const clouds = time.querySelector('clouds')?.getAttribute('value') || '';
           dataToItems.push({ dateStart, dateEnd, precipitation, humidity, temperature });
+          feels.push([dateStart,feelsLike,clouds,precipitation])
         }
-
+        setFeel(feels);
         setItems(dataToItems); // Guardar todos los elementos
       })
       .catch((error) => console.error('Error:', error));
@@ -82,7 +100,14 @@ function App() {
   useEffect(() => {
     if (selectedDate) {
       const filtered = items.filter((item) => formatFechaHora(item.dateStart as string) === selectedDate.valueOf());
+      const filteredFeels = feel.filter((item) => formatFechaHora(item[0]) === selectedDate.valueOf());
       setFilteredItems(filtered);
+      if (filteredFeels.length > 0) {
+        setFilteredFeel(filteredFeels[0]);
+      } else {
+        setFilteredFeel(['', '','','']); // Valores por defecto
+      } 
+
     }
   }, [selectedDate, items]);
 
@@ -104,14 +129,26 @@ function App() {
       {/* Título Principal */}
       <Grid size={{ xs: 12 }}>
         <h1 style={{ textAlign: 'center' }}>El tiempo en Guayaquil</h1>
-      </Grid>
-  
-      {/* Fecha Seleccionada */}
+             </Grid>
       <Grid size={{ xs: 12 }}>
         <h3>
           Fecha seleccionada: {selectedDate ? selectedDate.toString() : 'Ninguna fecha seleccionada'}
         </h3>
       </Grid>
+      {/* Selector de Fecha */}
+      <Grid size={{ xs: 12, md: 4 }}>
+            <ControlWeather onDateChange={handleDateChange} />
+          </Grid>
+      
+      <Grid size={{ xs: 12, md: 4 }}>
+      <ImageControl clouds={filteredFeel[2]} precipitation={filteredFeel[3]} />
+      </Grid>
+      <Grid size={{ xs: 12, md: 4 }}>
+      <TemperatureIndicator temperatureKelvin={filteredFeel[1]}/>
+      </Grid>
+  
+      {/* Fecha Seleccionada */}
+      
   
       {/* Indicadores */}
       {renderIndicators()}
@@ -119,10 +156,9 @@ function App() {
       {/* Tabla */}
       <Grid size={{ xs: 12, md: 8 }}>
         <Grid container spacing={2}>
-          {/* Selector de Fecha */}
-          <Grid size={{ xs: 12, md: 4 }}>
-            <ControlWeather onDateChange={handleDateChange} />
-          </Grid>
+        <Grid size={{ xs: 12, md: 4 }}>
+      <IndicatorWeather title={'Sensación térmica'} subtitle={formatFechaHora(filteredFeel[0])} value={`${kelvinToCelsius(filteredFeel[1])} °C`} /> 
+      </Grid>
   
           {/* Tabla de Datos */}
           <Grid size={{ xs: 12, md: 8 }}>
@@ -147,7 +183,7 @@ function App() {
   
       {/* Gráfico */}
       <Grid size={{ xs: 12, md: 4 }}>
-        <LineChartWeather />
+        <LineChartWeather selectedDate={selectedDate.toString()}/>
       </Grid>
     </Grid>
   );

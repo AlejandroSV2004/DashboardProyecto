@@ -9,7 +9,7 @@ import Item from "../interface/Item";
 import { useEffect, useState } from 'react';
 const formatoHora = (dateTime: String): String => {
   // Convierte el objeto String a una cadena normal y extrae la hora
-  const timeString = new Date(dateTime.toString()).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+  const timeString = new Date(dateTime.toString()).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit'});
   return new String(timeString); // Devuelve un nuevo objeto String
 };
 
